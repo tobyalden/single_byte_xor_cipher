@@ -6,6 +6,7 @@
 const char HEX_CHARS[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 const double PAIR_WEIGHT = 0.0384848485;
 
+char * single_byte_xor_cipher(char *hex);
 char * fixed_xor(char *hex, char *mask);
 double freq_score(char c);
 double pair_freq_score(char a, char b);
@@ -13,8 +14,12 @@ double pair_freq_score(char a, char b);
 int main(int argc, char *argv[])
 {
   char *hex = argv[1];
-  printf("HEX INPUT: %s\n", hex);
+  printf("DECRYPTED MESSAGE: %s\n", single_byte_xor_cipher(hex));
+  return 0;
+}
 
+char * single_byte_xor_cipher(char *hex)
+{
   int hex_length;
   for(hex_length = 0; hex[hex_length] != '\0'; hex_length++) {
     ;
@@ -23,16 +28,13 @@ int main(int argc, char *argv[])
   char xor[3];
   xor[2] = '\0';
   double high_score = 0;
-  char *decrypted_msg;
+  char *decrypted_msg = (char *) malloc(hex_length/2+1);
   for(int i = 0; i < 256; i++)
   {
     char decrypt_attempt[hex_length/2+1];
     xor[0] = HEX_CHARS[i/16];
     xor[1] = HEX_CHARS[i%16];
-    printf("%s: ", xor);
-
-    // char *message;
-
+    // printf("%s: ", xor);
     char hex_char[3];
     hex_char[2] = '\0';
     double decrypt_score = 0;
@@ -57,12 +59,11 @@ int main(int argc, char *argv[])
     {
       high_score = decrypt_score;
       strcpy(decrypted_msg, decrypt_attempt);
-      // decrypted_msg = decrypt_attempt;
     }
     decrypt_attempt[hex_length/2] = '\0';
-    printf("%s (Score: %f)\n", decrypt_attempt, decrypt_score);
+    // printf("%s (Score: %f)\n", decrypt_attempt, decrypt_score);
   }
-  printf("Decrypted message: %s (High Score: %f)\n", decrypted_msg, high_score);
+  return decrypted_msg;
 }
 
 double freq_score(char c)
